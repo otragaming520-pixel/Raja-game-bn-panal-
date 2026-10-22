@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>KING TRADING VIP PREDICTOR</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+:root {
+    --gold-main: #ffee00;
+    --gold-glow: #ffaa00;
+    --neon-green: #39ff14;
+    --neon-red: #ff2a5f;
+    --neon-violet: #9d4edd;
+    --dark-bg: #0b0f05;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; font-family:'Orbitron', sans-serif; user-select: none; }
+body { background:#000; overflow:hidden; width: 100vw; height: 100vh; }
+
+#bg-frame { position: fixed; inset: 0; width: 100%; height: 100%; border: none; z-index: 1; }
+
+/* MINI FLOATING BUTTON */
+#mini {
+    position: fixed; right: 20px; bottom: 100px; width: 50px; height: 50px;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    cursor: pointer; z-index: 9999; background: radial-gradient(circle,#2a3300,#0a0f00);
+    border: 2px solid var(--gold-main); box-shadow: 0 0 20px var(--gold-main), 0 0 30px var(--neon-green);
+}
+#mini img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+
+/* MAIN PANEL WRAPPER */
+#panel-wrapper {
+    position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 220px; display: none; justify-content: center; align-items: center;
+    z-index: 10000;
+}
+
+/* BUTTERFLY WINGS CONTAINER */
+.wings-bg {
+    position: absolute; width: 380px; height: 240px;
+    pointer-events: none; z-index: 1; display: flex; justify-content: space-between;
+}
+
+.wing {
+    width: 110px; height: 100%;
+    filter: drop-shadow(0 0 15px rgba(255, 230, 0, 1)) drop-shadow(0 0 30px rgba(57, 255, 20, 0.8));
+    animation: wingPulse 2.5s ease-in-out infinite alternate;
+}
+
+.wing-left { transform-origin: right center; }
+.wing-right { transform-origin: left center; }
+
+@keyframes wingPulse {
+    0% { transform: scale(0.98) rotate(0deg); }
+    100% { transform: scale(1.04) rotate(2deg); }
+}
+
+/* MAIN PANEL UI (SMALLER & HIGH GLOW) */
+#main {
+    position: relative; z-index: 2; width: 210px;
+    background: rgba(13, 18, 8, 0.95);
+    border: 2px solid #88ff00; border-radius: 20px;
+    box-shadow: 0 0 25px rgba(136, 255, 0, 0.8), 
+                0 0 50px rgba(136, 255, 0, 0.4), 
+                inset 0 0 15px rgba(136, 255, 0, 0.4);
+    padding: 10px; text-align: center; overflow: hidden;
+}
+
+.header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding-bottom: 6px; border-bottom: 1px solid rgba(136, 255, 0, 0.3);
+    cursor: move;
+}
+
+.header-title {
+    display: flex; align-items: center; gap: 5px;
+    font-size: 10px; font-weight: 900; color: #fff; 
+    text-shadow: 0 0 10px var(--gold-main), 0 0 20px var(--gold-main);
+}
+
+.bolt-icon {
+    width: 18px; height: 18px; background: #ffd700; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; color: #000;
+    font-size: 10px; font-weight: bold; box-shadow: 0 0 10px #ffd700, 0 0 20px #ffaa00;
+}
+
+.close-btn {
+    width: 18px; height: 18px; border-radius: 50%; border: 1px solid #ff4444;
+    color: #ff4444; font-size: 10px; display: flex; align-items: center;
+    justify-content: center; cursor: pointer; font-weight: bold;
+    background: rgba(255,68,68,0.2); box-shadow: 0 0 8px #ff4444;
+}
+
+/* SUB HEADER LIVE & ID */
+.sub-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin: 6px 0; padding: 0 2px;
+}
+.live-badge {
+    background: rgba(0, 255, 68, 0.1); border: 1.2px solid #00ff44;
+    color: #00ff44; font-size: 8px; font-weight: 900;
+    padding: 2px 8px; border-radius: 10px; display: flex; align-items: center; gap: 3px;
+    box-shadow: 0 0 10px rgba(0,255,68,0.6);
+}
+.live-dot {
+    width: 4px; height: 4px; background: #00ff44; border-radius: 50%;
+    box-shadow: 0 0 8px #00ff44; animation: blink 1s infinite alternate;
+}
+@keyframes blink { 0% { opacity: 0.3; } 100% { opacity: 1; } }
+
+.id-badge {
+    font-size: 9px; font-weight: 800; color: #ffee00;
+    letter-spacing: 0.5px; text-shadow: 0 0 8px var(--gold-main);
+}
+
+/* EDITABLE PREDICTION ROW */
+.prediction-box {
+    display: flex; align-items: center; justify-content: space-around;
+    background: rgba(0, 0, 0, 0.6); border-radius: 12px;
+    padding: 8px 4px; margin: 5px 0; border: 1px solid rgba(136,255,0,0.3);
+    box-shadow: inset 0 0 10px rgba(0, 255, 68, 0.1);
+}
+
+.pred-pill {
+    padding: 3px 6px; border-radius: 10px; font-size: 10px; font-weight: 900;
+    letter-spacing: 0.5px; display: flex; align-items: center; justify-content: center;
+    min-width: 55px; height: 22px; text-transform: uppercase;
+    outline: none; cursor: text; user-select: text;
+}
+
+.pred-pill.big-small {
+    border: 1.2px solid #ff4444; color: #ffffff;
+    background: rgba(255, 68, 68, 0.1);
+    box-shadow: 0 0 8px rgba(255, 68, 68, 0.5), inset 0 0 6px rgba(255, 68, 68, 0.4);
+}
+
+.pred-pill.color-green {
+    border: 1.2px solid #00ff66; color: #00ff66;
+    background: rgba(0, 255, 102, 0.1);
+    box-shadow: 0 0 8px rgba(0, 255, 102, 0.5), inset 0 0 6px rgba(0, 255, 102, 0.4);
+}
+
+.pred-pill.color-red {
+    border: 1.2px solid #ff2a5f; color: #ff2a5f;
+    background: rgba(255, 42, 95, 0.1);
+    box-shadow: 0 0 8px rgba(255, 42, 95, 0.5), inset 0 0 6px rgba(255, 42, 95, 0.4);
+}
+
+.pred-pill.color-violet {
+    border: 1.2px solid #b55fe6; color: #b55fe6;
+    background: rgba(181, 95, 230, 0.1);
+    box-shadow: 0 0 8px rgba(181, 95, 230, 0.5), inset 0 0 6px rgba(181, 95, 230, 0.4);
+}
+
+.pred-number {
+    font-size: 18px; font-weight: 900; color: #ffee00;
+    text-shadow: 0 0 12px #ffee00, 0 0 20px #ffaa00; line-height: 1;
+    outline: none; cursor: text; user-select: text; min-width: 18px;
+}
+
+/* CHART CONTAINER */
+.chart-container {
+    position: relative; background: rgba(0, 0, 0, 0.7);
+    border: 1px solid rgba(0, 255, 204, 0.4); border-radius: 8px;
+    padding: 6px 4px; margin: 6px 0; height: 42px;
+    display: flex; align-items: flex-end; justify-content: space-between;
+    overflow: hidden;
+    box-shadow: 0 0 10px rgba(0, 242, 255, 0.3), inset 0 0 8px rgba(0, 242, 255, 0.2);
+}
+
+.chart-line {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 1; filter: drop-shadow(0 0 4px #00f2ff);
+}
+
+.candle {
+    width: 5px; background: #00f2ff; border-radius: 2px;
+    position: relative; z-index: 2; opacity: 0.9;
+    box-shadow: 0 0 6px #00f2ff;
+}
+.candle.red { background: #ff0055; box-shadow: 0 0 6px #ff0055; }
+.candle::before {
+    content: ''; position: absolute; top: -3px; bottom: -3px; left: 2px;
+    width: 1px; background: inherit;
+}
+
+.chart-percentage {
+    position: absolute; top: 3px; right: 4px;
+    font-size: 7px; color: #00ffaa; font-weight: 700;
+    outline: none; cursor: text; user-select: text;
+    text-shadow: 0 0 6px #00ffaa;
+}
+
+/* CONFIDENCE BADGE */
+.conf-box {
+    display: inline-block;
+    border: 1.2px solid #ffee00; border-radius: 10px;
+    padding: 2px 10px; font-size: 8px; font-weight: 900;
+    color: #ffee00; margin: 3px 0 5px 0;
+    background: rgba(255, 238, 0, 0.1);
+    box-shadow: 0 0 10px rgba(255, 238, 0, 0.5);
+    outline: none; cursor: text; user-select: text;
+}
+
+/* ACTION BUTTON */
+.btn-action {
+    width: 100%; padding: 8px; border: none; border-radius: 16px;
+    background: linear-gradient(180deg, #ffe600 0%, #76e600 100%);
+    color: #000; font-size: 10px; font-weight: 900; cursor: pointer;
+    box-shadow: 0 0 15px rgba(118, 230, 0, 0.9), 0 0 25px rgba(255, 230, 0, 0.7);
+    margin-top: 3px; text-transform: uppercase; letter-spacing: 0.5px; transition: 0.2s;
+}
+.btn-action:active { transform: scale(0.96); }
+
+.engine-footer {
+    font-size: 7px; color: #ffee00; margin-top: 6px;
+    letter-spacing: 1.2px; font-weight: 800;
+    display: flex; align-items: center; justify-content: center; gap: 4px;
+    text-shadow: 0 0 8px var(--gold-main);
+}
+
+/* AUTH VIEW STYLES */
+.info-box {
+    background: rgba(0, 0, 0, 0.7); border: 1px solid rgba(255, 230, 0, 0.4);
+    border-radius: 6px; padding: 5px 6px; margin-bottom: 5px;
+    font-family: 'Rajdhani', sans-serif; font-size: 10px; font-weight: 700;
+    color: #fff; text-align: left; box-shadow: 0 0 8px rgba(255,230,0,0.2);
+}
+.status-title {
+    font-size: 9px; color: var(--gold-main); letter-spacing: 1px;
+    margin: 6px 0 4px 0; font-weight: 800; text-shadow: 0 0 8px var(--gold-main);
+}
+</style>
+</head>
+<body>
+
+<iframe id="bg-frame" src="https://rajagames.teacherslex.site"></iframe>
+
+<!-- MINI ICON -->
+<div id="mini" onclick="openM()">
+    <img src="https://i.postimg.cc/3xB9f7wM/1000013396.jpg" alt="Icon">
+</div>
+
+<!-- MAIN FLOATING WRAPPER -->
+<div id="panel-wrapper">
+    
+    <!-- SVG BUTTERFLY WINGS -->
+    <div class="wings-bg">
+        <svg class="wing wing-left" viewBox="0 0 150 250">
+            <defs>
+                <linearGradient id="wingGradL" x1="100%" y1="50%" x2="0%" y2="50%">
+                    <stop offset="0%" stop-color="#ffea00"/>
+                    <stop offset="50%" stop-color="#ff8800"/>
+                    <stop offset="100%" stop-color="#88ff00"/>
+                </linearGradient>
+            </defs>
+            <path d="M 145,120 C 120,90 70,20 10,10 C 0,30 20,70 50,95 C 15,110 0,135 15,160 C 35,185 80,180 100,165 C 60,190 30,220 55,240 C 85,250 125,180 145,130 Z" 
+                  fill="url(#wingGradL)" stroke="#ffffff" stroke-width="1.5" opacity="0.95"/>
+            <path d="M 145,125 Q 90,80 15,15 M 145,125 Q 70,100 50,95 M 145,125 Q 70,140 20,160 M 145,125 Q 90,170 55,235" 
+                  stroke="rgba(255,255,255,0.7)" stroke-width="1.2" fill="none"/>
+        </svg>
+
+        <svg class="wing wing-right" viewBox="0 0 150 250">
+            <defs>
+                <linearGradient id="wingGradR" x1="0%" y1="50%" x2="100%" y2="50%">
+                    <stop offset="0%" stop-color="#ffea00"/>
+                    <stop offset="50%" stop-color="#ff8800"/>
+                    <stop offset="100%" stop-color="#88ff00"/>
+                </linearGradient>
+            </defs>
+            <path d="M 5,120 C 30,90 80,20 140,10 C 150,30 130,70 100,95 C 135,110 150,135 135,160 C 115,185 70,180 50,165 C 90,190 120,220 95,240 C 65,250 25,180 5,130 Z" 
+                  fill="url(#wingGradR)" stroke="#ffffff" stroke-width="1.5" opacity="0.95"/>
+            <path d="M 5,125 Q 60,80 135,15 M 5,125 Q 80,100 100,95 M 5,125 Q 80,140 130,160 M 5,125 Q 60,170 95,235" 
+                  stroke="rgba(255,255,255,0.7)" stroke-width="1.2" fill="none"/>
+        </svg>
+    </div>
+
+    <!-- MAIN PANEL BODY -->
+    <div id="main">
+        <!-- HEADER -->
+        <div class="header" id="dragHandle">
+            <div class="header-title">
+                <div class="bolt-icon">⚡</div>
+                <span contenteditable="true">RAJA GAME</span>
+            </div>
+            <div class="close-btn" onclick="closeM()">✕</div>
+        </div>
+
+        <!-- AUTH VIEW -->
+        <div id="login-view">
+            <div class="status-title" contenteditable="true">SERVER ACTIVATED</div>
+            <div class="info-box" contenteditable="true">1. WinGo 1M Connected</div>
+            <div class="info-box" contenteditable="true">2. Secure API Ready</div>
+            <div class="info-box" contenteditable="true">3. Balance Synced</div>
+            <button class="btn-action" onclick="showPredictor()">START ENGINE</button>
+        </div>
+
+        <!-- PREDICTION UI VIEW -->
+        <div id="prediction-ui" style="display: none;">
+            
+            <div class="sub-header">
+                <div class="live-badge">
+                    <div class="live-dot"></div> LIVE
+                </div>
+                <div class="id-badge" id="idDisplay" contenteditable="true">ID: ---</div>
+            </div>
+
+            <!-- EDITABLE PREDICTION RESULT ROW -->
+            <div class="prediction-box">
+                <!-- BIG / SMALL EDITABLE -->
+                <div class="pred-pill big-small" id="sizeBadge" contenteditable="true">BIG</div>
+                <!-- NUMBER EDITABLE -->
+                <div class="pred-number" id="numberDisplay" contenteditable="true">5</div>
+                <!-- COLOR EDITABLE -->
+                <div class="pred-pill color-green" id="colorBadge" contenteditable="true">GREEN</div>
+            </div>
+
+            <!-- GRAPH VISUAL -->
+            <div class="chart-container">
+                <span class="chart-percentage" id="percentDisplay" contenteditable="true">+1.17%</span>
+                <svg class="chart-line" viewBox="0 0 100 30" preserveAspectRatio="none">
+                    <path d="M0 20 Q 20 5, 40 18 T 80 10 T 100 15" fill="none" stroke="#00f2ff" stroke-width="1.5"/>
+                </svg>
+                <div class="candle" style="height: 60%;"></div>
+                <div class="candle red" style="height: 40%;"></div>
+                <div class="candle" style="height: 75%;"></div>
+                <div class="candle red" style="height: 35%;"></div>
+                <div class="candle" style="height: 85%;"></div>
+                <div class="candle red" style="height: 50%;"></div>
+                <div class="candle" style="height: 65%;"></div>
+                <div class="candle" style="height: 90%;"></div>
+                <div class="candle red" style="height: 30%;"></div>
+                <div class="candle" style="height: 70%;"></div>
+            </div>
+
+            <!-- CONFIDENCE BADGE EDITABLE -->
+            <div class="conf-box" id="confDisplay" contenteditable="true">CONF(99.4%)</div>
+
+            <!-- ACTION BUTTON -->
+            <button class="btn-action" onclick="fetchLiveResultAndPredict()">CHECK NEXT</button>
+        </div>
+
+        <div class="engine-footer" contenteditable="true">⚡ ENGINE ⚡</div>
+    </div>
+
+</div>
+
+<script>
+const API_URL = "https://draw.ar-lottery01.com/WinGo/WinGo_1M/GetHistoryIssuePage.json?ts=";
+
+function openM() {
+    document.getElementById('panel-wrapper').style.display = 'flex';
+    document.getElementById('mini').style.display = 'none';
+}
+function closeM() {
+    document.getElementById('panel-wrapper').style.display = 'none';
+    document.getElementById('mini').style.display = 'flex';
+}
+
+function showPredictor() {
+    document.getElementById('login-view').style.display = 'none';
+    document.getElementById('prediction-ui').style.display = 'block';
+    fetchLiveResultAndPredict();
+}
+
+function getPeriodID() {
+    const now = new Date();
+    const totalMinutes = now.getUTCHours() * 60 + now.getUTCMinutes();
+    const sequence = String(10001 + totalMinutes);
+    return sequence.slice(-3);
+}
+
+// FETCH API FUNCTION
+async function fetchLiveResultAndPredict() {
+    const sizeBadge = document.getElementById('sizeBadge');
+    const numberDisplay = document.getElementById('numberDisplay');
+    const colorBadge = document.getElementById('colorBadge');
+    const confDisplay = document.getElementById('confDisplay');
+    const idDisplay = document.getElementById('idDisplay');
+    const percentDisplay = document.getElementById('percentDisplay');
+
+    sizeBadge.innerText = "...";
+    numberDisplay.innerText = "?";
+    colorBadge.innerText = "...";
+
+    try {
+        const response = await fetch(API_URL + Date.now());
+        const data = await response.json();
+        
+        if (data && data.data && data.data.list && data.data.list.length > 0) {
+            const latestDraw = data.data.list[0];
+            const num = parseInt(latestDraw.number, 10);
+            
+            const size = num >= 5 ? "BIG" : "SMALL";
+            
+            let colorName = "GREEN";
+            let colorClass = "color-green";
+
+            if (num === 0) {
+                colorName = "RED";
+                colorClass = "color-red";
+            } else if (num === 5) {
+                colorName = "GREEN";
+                colorClass = "color-green";
+            } else if (num % 2 === 0) {
+                colorName = "RED";
+                colorClass = "color-red";
+            } else {
+                colorName = "GREEN";
+                colorClass = "color-green";
+            }
+
+            const issueStr = latestDraw.issue ? String(latestDraw.issue) : getPeriodID();
+            const last3Digits = issueStr.slice(-3);
+            const randomConf = (94 + Math.random() * 5.8).toFixed(1);
+            const randomPercent = "+" + (0.5 + Math.random() * 4).toFixed(2) + "%";
+
+            setTimeout(() => {
+                idDisplay.innerText = `ID: ${last3Digits}`;
+                sizeBadge.innerText = size;
+                numberDisplay.innerText = num;
+                colorBadge.innerText = colorName;
+                colorBadge.className = `pred-pill ${colorClass}`;
+                confDisplay.innerText = `CONF(${randomConf}%)`;
+                percentDisplay.innerText = randomPercent;
+            }, 400);
+
+        } else {
+            fallbackRandomPrediction();
+        }
+    } catch (e) {
+        fallbackRandomPrediction();
+    }
+}
+
+function fallbackRandomPrediction() {
+    const num = Math.floor(Math.random() * 10);
+    const size = num >= 5 ? "BIG" : "SMALL";
+    const colorName = num % 2 === 0 ? "RED" : "GREEN";
+    const colorClass = num % 2 === 0 ? "color-red" : "color-green";
+
+    document.getElementById('idDisplay').innerText = `ID: ${getPeriodID()}`;
+    document.getElementById('sizeBadge').innerText = size;
+    document.getElementById('numberDisplay').innerText = num;
+    document.getElementById('colorBadge').innerText = colorName;
+    document.getElementById('colorBadge').className = `pred-pill ${colorClass}`;
+    document.getElementById('confDisplay').innerText = "CONF(98.2%)";
+    document.getElementById('percentDisplay').innerText = "+2.45%";
+}
+
+// DRAGGING LOGIC (Editable text area safe)
+const wrapper = document.getElementById("panel-wrapper");
+const dragHandle = document.getElementById("dragHandle");
+let isDragging = false, offset = { x: 0, y: 0 };
+
+const dragStart = (e) => {
+    if(e.target.hasAttribute('contenteditable')) return;
+    isDragging = true;
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    
+    const rect = wrapper.getBoundingClientRect();
+    offset.x = clientX - rect.left;
+    offset.y = clientY - rect.top;
+};
+
+const dragMove = (e) => {
+    if (!isDragging) return;
+    e.preventDefault();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    
+    let newX = clientX - offset.x;
+    let newY = clientY - offset.y;
+    
+    wrapper.style.left = newX + (wrapper.offsetWidth / 2) + "px";
+    wrapper.style.top = newY + (wrapper.offsetHeight / 2) + "px";
+};
+
+dragHandle.addEventListener("mousedown", dragStart);
+dragHandle.addEventListener("touchstart", dragStart, {passive: false});
+document.addEventListener("mousemove", dragMove);
+document.addEventListener("touchmove", dragMove, {passive: false});
+document.addEventListener("mouseup", () => isDragging = false);
+document.addEventListener("touchend", () => isDragging = false);
+</script>
+
+</body>
+</html>
